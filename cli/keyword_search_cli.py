@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
 
 import argparse
-from lib.keyword_search import build_command, search_command
+from lib.keyword_search import (
+    build_command,
+    search_command,
+    tf_command,
+    idf_command,
+    tfidf_command,
+)
 
 
 def main() -> None:
@@ -12,6 +18,23 @@ def main() -> None:
 
     search_parser = subparsers.add_parser("search", help="Search movies using BM25")
     search_parser.add_argument("query", type=str, help="Search query")
+
+    tf_parser = subparsers.add_parser(
+        "tf", help="Get term frequency for a given document id and term"
+    )
+    tf_parser.add_argument("doc_id", type=int, help="Doument Id")
+    tf_parser.add_argument("term", type=str, help="term to get frequency for")
+
+    idf_parser = subparsers.add_parser(
+        "idf", help="Get inverse document frequency for a given term"
+    )
+    idf_parser.add_argument("term", type=str, help="term to get idf value for")
+
+    tfidf_parser = subparsers.add_parser(
+        "tfidf", help="Get term frequency for a given document id and term"
+    )
+    tfidf_parser.add_argument("doc_id", type=int, help="Doument Id")
+    tfidf_parser.add_argument("term", type=str, help="term to get frequency for")
 
     args = parser.parse_args()
 
@@ -25,6 +48,17 @@ def main() -> None:
             results = search_command(args.query)
             for i, result in enumerate(results, 1):
                 print(f'{i}. {result["title"]}')
+        case "tf":
+            tf = tf_command(args.doc_id, args.term)
+            print(f"Term frequency of '{args.doc_id} in document '{args.doc_id}: {tf}'")
+        case "idf":
+            idf = idf_command(args.term)
+            print(f"Inverse document frequency of '{args.term}': {idf:.2f}")
+        case "tfidf":
+            tf_idf = tfidf_command(args.doc_id, args.term)
+            print(
+                f"TF-IDF score of '{args.term}' in document '{args.doc_id}': {tf_idf:.2f}"
+            )
         case _:
             parser.print_help()
 
