@@ -3,9 +3,13 @@ import os
 from pathlib import Path
 from typing import Any
 
+DOCUMENT_PREVIEW_LENGTH = 100
 BM25_K1 = 1.5
 BM25_B = 0.75
 DEFAULT_SEARCH_LIMIT = 5
+DEFAULT_CHUNK_SIZE = 200
+DEFAULT_MAX_CHUNK_SIZE = 4
+DEFAULT_CHUNK_OVERLAP = 0
 PROJECT_ROOT = Path(__file__).parents[2]
 DATA_PATH = os.path.join(PROJECT_ROOT, "data", "movies.json")
 STOPWORDS_PATH = os.path.join(PROJECT_ROOT, "data", "stopwords.txt")
