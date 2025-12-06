@@ -1,5 +1,8 @@
 import os
 
+
+from lib.query_reranking import rerank
+from lib.query_enhancement import enhance_query
 from lib.search_utils import (
     DEFAULT_ALPHA_VALUE,
     DEFAULT_K_VALUE,
@@ -8,6 +11,7 @@ from lib.search_utils import (
 )
 from .keyword_search import InvertedIndex
 from .semantic_search import ChunkedSemanticSearch
+from lib.evaluate_query import evaluate_response
 
 
 class HybridSearch:
@@ -196,13 +200,50 @@ def weighted_search_command(
         print()
 
 
-def rrf_search_command(query: str, k: int = DEFAULT_K_VALUE, limit: int = 5):
+def rrf_search_command(
+    query: str,
+    k: int = DEFAULT_K_VALUE,
+    limit: int = 5,
+    enhance=None,
+    rerank_method=None,
+    evaluate=False,
+):
     movies = load_movies()
     searcher = HybridSearch(movies)
-    results = searcher.rrf_search(query, k, limit)
+
+    search_limit = limit * 3 if rerank_method else limit
+
+    print("Original query", query)
+    if enhance:
+        enhanced_query = enhance_query(query, method=enhance)
+        query = enhanced_query
+
+        print(f"Enhanced query ({enhance}): '{query}' -> '{enhanced_query}'\n")
+
+    print("Enhanced query", query)
+
+    results = searcher.rrf_search(query, k, search_limit)
+
+    print("After evaluating")
+    if evaluate:
+        evaluate_response(query, results)
+
+    print("After rrf search")
+    print(results)
+
+    if rerank_method:
+        results = rerank(query, results, limit, rerank_method)
+
+    print("After reranking")
+    print(results)
 
     for i, res in enumerate(results, 1):
-        print(f"{i}. {res['title']}")
+        rating = 0
+        if "rating" in res:
+            rating = res["rating"]
+        print(f"{i}. {res['title']} {rating}/3")
+        if rerank_method:
+            print(f"   Rerank Score: {res.get('individual_score', 0):.3f}/10")
         print(f"   RRF Score: {res.get('score', 0):.3f}")
         metadata = res.get("metadata", {})
         ranks = []
@@ -213,3 +254,5 @@ def rrf_search_command(query: str, k: int = DEFAULT_K_VALUE, limit: int = 5):
         if ranks:
             print(f"   {', '.join(ranks)}")
         print(f"   {res['document'][:100]}...")
+
+    return results[:limit]
