@@ -236,23 +236,23 @@ def rrf_search_command(
 
     print("After reranking")
     print(results)
-
-    for i, res in enumerate(results, 1):
-        rating = 0
-        if "rating" in res:
-            rating = res["rating"]
-        print(f"{i}. {res['title']} {rating}/3")
-        if rerank_method:
-            print(f"   Rerank Score: {res.get('individual_score', 0):.3f}/10")
-        print(f"   RRF Score: {res.get('score', 0):.3f}")
-        metadata = res.get("metadata", {})
-        ranks = []
-        if metadata.get("bm25_rank"):
-            ranks.append(f"BM25 Rank: {metadata['bm25_rank']}")
-        if metadata.get("semantic_rank"):
-            ranks.append(f"Semantic Rank: {metadata['semantic_rank']}")
-        if ranks:
-            print(f"   {', '.join(ranks)}")
-        print(f"   {res['document'][:100]}...")
+    #
+    # for i, res in enumerate(results, 1):
+    #     rating = 0
+    #     if "rating" in res:
+    #         rating = res["rating"]
+    #     print(f"{i}. {res['title']} {rating}/3")
+    #     if rerank_method:
+    #         print(f"   Rerank Score: {res.get('individual_score', 0):.3f}/10")
+    #     print(f"   RRF Score: {res.get('score', 0):.3f}")
+    #     metadata = res.get("metadata", {})
+    #     ranks = []
+    #     if metadata.get("bm25_rank"):
+    #         ranks.append(f"BM25 Rank: {metadata['bm25_rank']}")
+    #     if metadata.get("semantic_rank"):
+    #         ranks.append(f"Semantic Rank: {metadata['semantic_rank']}")
+    #     if ranks:
+    #         print(f"   {', '.join(ranks)}")
+    #     print(f"   {res['document'][:100]}...")
 
     return results[:limit]
